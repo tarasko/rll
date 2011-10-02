@@ -65,4 +65,6 @@ source_group(src\\value_function FILES ${src_value_function})
 source_group(src\\detail FILES ${src_detail})
 source_group(src\\detail\\fann FILES ${src_detail_fann})
 
+add_custom_target(doc COMMAND doxygen WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+
 add_subdirectory(examples)
