@@ -7,7 +7,7 @@
 
 namespace rll {
 
-/// @brief Agent that participate in reinforcement learning. 
+/// @brief Agent that participates in reinforcement learning. 
 ///
 /// Agent ties together value function, policy, and (on/off)policy property. 
 /// You are supposed to create agents on environment startup.
