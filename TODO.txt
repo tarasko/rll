@@ -1,4 +1,2 @@
-1. Main page for doxygen. Macroses, state and state-action, how to build.
-2. Make Cmake file to work independently from top level. Check for proper MSVC and gcc
-3. Script for creating docs and preparing sources for deploying.
-4. Documentation for types defined in rll_fwd.hpp
+1. How to build.
+2. Script for preparing sources for deploying.
