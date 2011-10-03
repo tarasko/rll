@@ -165,7 +165,7 @@ int main(int argc, char* argv[])
     cfg.gamma_ = 1.0;
 
     grid_world gw;
-    state_method m(&gw, cfg);
+    grid_world::method_type m(&gw, cfg);
 
     m.run(15000);
     gw.print_value_func();

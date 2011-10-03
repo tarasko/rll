@@ -166,7 +166,7 @@ int main()
     cfg.accumulating_ = false;
 
     tic_tac_toe game;
-    state_method m(&game, cfg);
+    tic_tac_toe::method_type m(&game, cfg);
 
     m.run(100000);
 }

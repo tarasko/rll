@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
     cfg.accumulating_ = false;
 
     grid_world gw;
-    action_method m(&gw, cfg);
+    grid_world::method_type m(&gw, cfg);
 
     m.run(2000);
     return 0;
