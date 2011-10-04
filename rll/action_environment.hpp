@@ -1,9 +1,10 @@
 #pragma once
 
 #include <rll/detail/environment_base.hpp>
+#include <rll/detail/action_method_base.hpp>
+#include <rll/detail/lambda_method.hpp>
 
 #include <rll/state_with_reserved_action.hpp>
-#include <rll/action_method.hpp>
 
 namespace rll {
 
@@ -15,7 +16,7 @@ public:
     /// @brief State type suitable for this environment.
     typedef state_with_reserved_action state_type;
     /// @brief Learning method for estimating value function.
-    typedef action_method method_type;
+    typedef detail::lambda_method<detail::action_method_base> method_type;
 
     /// @name Pure virtual`s that must be implemented
     //@{
@@ -34,7 +35,7 @@ public:
     virtual std::vector<rll_type> get_possible_actions() const = 0;
 
     /// @brief Active agent should take current action and recieve reward.
-    /// 
+    ///
     /// @return True if method should continue with next step, false if we got to terminal state.
     virtual bool do_action_assign_rewards(rll_type action) = 0;
     //@}

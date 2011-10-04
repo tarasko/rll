@@ -7,7 +7,7 @@
 using namespace rll;
 using namespace std;
 
-class tic_tac_toe : public state_environment 
+class tic_tac_toe : public state_environment
 {
     static const int WINING_POSITIONS[8][3];
 
@@ -51,10 +51,10 @@ tic_tac_toe::tic_tac_toe()
     agents().push_back(OPlayer);
 }
 
-void tic_tac_toe::init_episode() 
+void tic_tac_toe::init_episode()
 {
     active_agent_idx_ = 0;
-    for (int i=0; i<9; ++i) 
+    for (int i=0; i<9; ++i)
         state_[i] = 0;
 }
 
@@ -75,7 +75,7 @@ vector<tic_tac_toe::state_type> tic_tac_toe::get_possible_next_states() const
 
     for(int i = 0; i<9; ++i)
     {
-        if (state_[i] == 0) 
+        if (state_[i] == 0)
         {
             state new_state = state_.clone();
             new_state[i] = active_agent_idx_ == 0 ? 1 : 2;
@@ -94,14 +94,14 @@ bool tic_tac_toe::set_next_state_assign_rewards(const state_type& state)
     bool has_empty_squares = false;
 
     // Examine game field
-    for (int i=0; i<8; ++i) 
+    for (int i=0; i<8; ++i)
     {
         bool are_all_captured = true;
 
         for (int k=0; k<3; ++k)
         {
-            are_all_captured = 
-                are_all_captured && 
+            are_all_captured =
+                are_all_captured &&
                 state_[WINING_POSITIONS[i][k]] == my_sign;
 
             has_empty_squares = has_empty_squares || state_[WINING_POSITIONS[k][i]] == 0;
@@ -116,7 +116,7 @@ bool tic_tac_toe::set_next_state_assign_rewards(const state_type& state)
     }
 
     // Ok now check for draw
-    if (!has_empty_squares) 
+    if (!has_empty_squares)
         return false;
 
     // Switch active agent
@@ -128,18 +128,18 @@ bool tic_tac_toe::set_next_state_assign_rewards(const state_type& state)
 
 void tic_tac_toe::print_state() const
 {
-    if (episode() % 100) 
+    if (episode() % 100)
         return;
 
     cout << "Episode: " << episode()
-        << " Step: " <<  step() 
-        << " Value: " 
+        << " Step: " <<  step()
+        << " Value: "
         << agents()[active_agent_idx_]->vf().get_value(state_.clone().get_internal_rep())
         << endl;
 
-    for (int x=0; x<3; ++x) 
+    for (int x=0; x<3; ++x)
     {
-        for (int y=0; y<3; ++y) 
+        for (int y=0; y<3; ++y)
         {
             // Fill squares
             int sign = state_[x*3 + y];
@@ -157,7 +157,7 @@ void tic_tac_toe::print_state() const
 }
 
 
-int main() 
+int main()
 {
     config cfg;
     cfg.alpha_ = 0.1;
@@ -166,7 +166,5 @@ int main()
     cfg.accumulating_ = false;
 
     tic_tac_toe game;
-    tic_tac_toe::method_type m(&game, cfg);
-
-    m.run(100000);
+    simulate(&game, cfg, 100000);
 }

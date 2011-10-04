@@ -113,4 +113,17 @@ class neuronal_network;
 
 typedef std::shared_ptr<agent> agent_sp;
 
+/// @brief Run simulation.
+///
+/// @param env - Environment.
+/// @param config - Learning configuration.
+/// @param episodes - Number of episodes to run.
+template<typename Environment>
+inline void simulate(Environment* env, const config& config, unsigned int episodes)
+{
+    typedef typename Environment::method_type method_type;
+    method_type m(env, config);
+    m.run(episodes);
+}
+
 }

@@ -9,7 +9,7 @@
 using namespace rll;
 using namespace std;
 
-class grid_world : public state_environment 
+class grid_world : public state_environment
 {
     static const int ROWS = 7;
     static const int COLUMNS = 10;
@@ -68,7 +68,7 @@ grid_world::grid_world()
     m_wind[8] = 1;
 }
 
-void grid_world::init_episode() 
+void grid_world::init_episode()
 {
     state_[0] = 3;
     state_[1] = 0;
@@ -92,7 +92,7 @@ vector<grid_world::state_type> grid_world::get_possible_next_states() const
     int curRow = state_[0];
     int curCol = state_[1];
 
-    for (int i = 0; i < ACTIONS_SIZE; ++i) 
+    for (int i = 0; i < ACTIONS_SIZE; ++i)
     {
         int new_row = apply_row_bounds(curRow + ACTIONS[i].y_ - m_wind.at(curCol));
         int new_col = apply_col_bounds(curCol + ACTIONS[i].x_);
@@ -128,14 +128,14 @@ bool grid_world::set_next_state_assign_rewards(const state& state)
     }
 }
 
-void grid_world::print_value_func() 
+void grid_world::print_value_func()
 {
     ofstream fout("out.txt");
 
-    for (int row = 0; row < ROWS; ++row) 
+    for (int row = 0; row < ROWS; ++row)
     {
         state_[0] = row;
-        for (int col = 0; col < COLUMNS; ++col) 
+        for (int col = 0; col < COLUMNS; ++col)
         {
             state_[1] = col;
             fout.width(9);
@@ -145,29 +145,28 @@ void grid_world::print_value_func()
     }
 }
 
-int grid_world::apply_row_bounds(int i_row) 
+int grid_world::apply_row_bounds(int i_row)
 {
     i_row = i_row > 6 ? 6 : i_row;
     i_row = i_row < 0 ? 0 : i_row;
     return i_row;
 }
 
-int grid_world::apply_col_bounds(int i_col) 
+int grid_world::apply_col_bounds(int i_col)
 {
     i_col = i_col > 9 ? 9 : i_col;
     i_col = i_col < 0 ? 0 : i_col;
     return i_col;
 }
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
     config cfg;
     cfg.gamma_ = 1.0;
 
     grid_world gw;
-    grid_world::method_type m(&gw, cfg);
+    simulate(&gw, cfg, 15000);
 
-    m.run(15000);
     gw.print_value_func();
     return 0;
 }

@@ -11,7 +11,7 @@
 using namespace std;
 using namespace rll;
 
-class grid_world : public action_environment 
+class grid_world : public action_environment
 {
     static const int ROWS = 7;
     static const int COLUMNS = 10;
@@ -35,14 +35,14 @@ public:
     virtual bool do_action_assign_rewards(rll_type action);
 
 private:
-    static int apply_row_bounds(int i_row) 
+    static int apply_row_bounds(int i_row)
     {
         i_row = i_row > (ROWS - 1) ? (ROWS - 1) : i_row;
         i_row = i_row < 0 ? 0 : i_row;
         return i_row;
     }
 
-    static int apply_col_bounds(int i_col) 
+    static int apply_col_bounds(int i_col)
     {
         i_col = i_col > (COLUMNS - 1) ? (COLUMNS - 1) : i_col;
         i_col = i_col < 0 ? 0 : i_col;
@@ -63,7 +63,7 @@ grid_world::action grid_world::ACTIONS[] = {
 };
 
 
-grid_world::grid_world(void) 
+grid_world::grid_world(void)
     : m_wind(COLUMNS, 0)
     , state_(2)
 {
@@ -79,7 +79,7 @@ grid_world::grid_world(void)
     m_wind[8] = 1;
 }
 
-void grid_world::init_episode() 
+void grid_world::init_episode()
 {
     state_[0] = 3;
     state_[1] = 0;
@@ -103,7 +103,7 @@ vector<rll_type> grid_world::get_possible_actions() const
     int row = state_[0];
     int col = state_[1];
 
-    for (int i = 0; i<ACTIONS_SIZE; ++i) 
+    for (int i = 0; i<ACTIONS_SIZE; ++i)
     {
         if (apply_row_bounds(row + ACTIONS[i].y_) != row ||
             apply_col_bounds(col + ACTIONS[i].x_) != col)
@@ -127,8 +127,8 @@ bool grid_world::do_action_assign_rewards(rll_type action)
     if (finished)
     {
         agents()[0]->add_reward(1.0);
-        cout 
-            << "Episode number:" << episode() << "\t" 
+        cout
+            << "Episode number:" << episode() << "\t"
             << "Episode takes: " << step() << endl;
     }
     else
@@ -137,15 +137,14 @@ bool grid_world::do_action_assign_rewards(rll_type action)
     return !finished;
 }
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
     config cfg;
     cfg.gamma_ = 1.0;
     cfg.accumulating_ = false;
 
     grid_world gw;
-    grid_world::method_type m(&gw, cfg);
+    simulate(&gw, cfg, 2000);
 
-    m.run(2000);
     return 0;
 }

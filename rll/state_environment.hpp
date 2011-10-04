@@ -1,8 +1,10 @@
 #pragma once
 
 #include <rll/detail/environment_base.hpp>
-#include "state.hpp"
-#include "state_method.hpp"
+#include <rll/detail/state_method_base.hpp>
+#include <rll/detail/lambda_method.hpp>
+
+#include <rll/state.hpp>
 
 namespace rll {
 
@@ -14,7 +16,7 @@ public:
     /// @brief State type suitable for this environment.
     typedef state state_type;
     /// @brief Learning method for estimating value function.
-    typedef state_method method_type;
+    typedef detail::lambda_method<detail::state_method_base> method_type;
 
     /// @name Pure virtual`s that must be implemented
     //@{
