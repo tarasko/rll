@@ -1,2 +1,0 @@
-1. How to build.
-2. Script for preparing sources for deploying.
