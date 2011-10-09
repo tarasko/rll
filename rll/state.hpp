@@ -6,6 +6,8 @@
 
 namespace rll {
 
+/// @todo Ability to assign state using initializer list
+
 /// @brief Represent agent state.
 ///
 /// Agent state consist of fixed number of signal values. Application is supposed to 
