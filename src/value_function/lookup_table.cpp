@@ -6,7 +6,7 @@ using namespace std;
 
 namespace rll { namespace value_function {
 
-double lookup_table::get_value(const vector_rllt_csp& st) 
+double lookup_table::get_value(const state_rep_csp& st) 
 {
     value_map::iterator i = values_.find(st);
     if (i != values_.end()) 

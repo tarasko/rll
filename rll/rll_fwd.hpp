@@ -86,10 +86,15 @@ typedef int_or_double rll_type;
 
 namespace rll {
 
-typedef std::vector<double> vector_dbl;
+typedef std::vector<double> vector_double;
+typedef std::vector<int> vector_int;
 typedef std::vector<rll_type> vector_rllt;
+
 typedef std::shared_ptr<vector_rllt> vector_rllt_sp;
 typedef std::shared_ptr<const vector_rllt> vector_rllt_csp;
+
+typedef std::shared_ptr<const vector_int> vector_int_csp;
+typedef std::shared_ptr<const vector_double> vector_double_csp;
 
 struct config;
 class agent;
@@ -106,7 +111,12 @@ class egreedy;
 }
 
 namespace value_function {
-class iface;
+
+template<typename T> class iface_tpl;
+typedef iface_tpl<rll_type> iface;
+typedef iface_tpl<int> iface_int;
+typedef iface_tpl<double> iface_double;
+
 class lookup_table;
 class neuronal_network;
 }

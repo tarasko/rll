@@ -88,7 +88,7 @@ void state_method_base::run_episode_impl()
     }
 
     // Get terminal rewards for all agents
-    vector_dbl terminal_rewards(env_->agents().size());
+    vector_double terminal_rewards(env_->agents().size());
     std::transform(
         env_->agents().begin()
       , env_->agents().end()

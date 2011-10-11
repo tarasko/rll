@@ -1,5 +1,7 @@
 #include <rll/rll.hpp>
 
+#include <array>
+
 #include <math.h>
 
 using namespace rll;
@@ -26,29 +28,102 @@ const double EDGE_POSITION = 2.4;
 // Maximal angle in radians before terminal reward and reset.
 const double ANGLE_EDGE = 0.2094384;
 
+// State consist of four signals
+// Define names for state signals.
+enum 
+{
+    CART_POSITION = 0,         // in meters
+    CART_VELOCITY = 1,
+    POLE_ANGLE = 2,            // in radians
+    POLE_ANGULAR_VELOCITY = 3,
+    ACTION = 4
+};
+
+class cart_pole_tiling_value_function : public value_function::iface
+{
+public:
+    cart_pole_tiling_value_function() 
+    {
+        values_.assign(0.0);
+    }
+
+    double get_value(const state_rep_csp& st)
+    {
+        return values_[get_box(st)];
+    }
+
+    void update(const update_list& lst)
+    {
+        for_each(lst.begin(), lst.end(), [&](update_list::const_reference r) -> void
+        {
+            values_[get_box(r.first)] = r.second;
+        });
+    }
+
+private:
+    static size_t get_box(const state_rep_csp& st)
+    {
+        size_t box = 0;
+
+        const double one_degree = 0.0174532;	/* 2pi/360 */
+        const double six_degrees = 0.1047192;
+        const double fifty_degrees = 0.87266;
+
+        const state_rep& state = *st;
+
+        if (state[CART_POSITION] < -0.8) 
+            box = 0;
+        else if (state[CART_POSITION] < 0.8) 
+            box = 1;
+        else
+            box = 2;
+
+        if (state[CART_VELOCITY] < -0.5);
+        else if (state[CART_VELOCITY] < 0.5)
+            box += 3;
+        else
+            box += 6;
+
+        if (state[POLE_ANGLE] < -six_degrees);
+        else if (state[POLE_ANGLE] < -one_degree)
+            box += 9;
+        else if (state[POLE_ANGLE] < 0)
+            box += 18;
+        else if (state[POLE_ANGLE] < one_degree)
+            box += 27;
+        else if (state[POLE_ANGLE] < six_degrees)
+            box += 36;
+        else
+            box += 45;
+
+        if (state[POLE_ANGULAR_VELOCITY] < -fifty_degrees);
+        else if (state[POLE_ANGULAR_VELOCITY] < fifty_degrees)
+            box += 54;
+        else
+            box += 108;
+
+        if (state[ACTION] > 0)
+            box += 216;
+
+        return box;
+    }
+
+    std::array<double, 432> values_;
+};
+
 class cart_pole_balancing : public action_environment
 {
-    // State consist of four signals
-    // Define names for state signals.
-    enum 
-    {
-        CART_POSITION = 0,         // in meters
-        CART_VELOCITY = 1,
-        POLE_ANGLE = 2,            // in radians
-        POLE_ANGULAR_VELOCITY = 3
-    };
-
 public:
     cart_pole_balancing()
         : state_(4)
         , actions_(2)
         , p_(0.1)
-        , vf_(10)
+        , nn_vf_(10)
     {        
         actions_[0] = -FORCE;
         actions_[1] = FORCE;
 
-        agents().push_back(make_shared<agent>(&vf_, &p_));
+        agents().push_back(make_shared<agent>(&nn_vf_, &p_));
     }
 
 private:
@@ -122,14 +197,16 @@ private:
     vector_rllt actions_;  // Possible actions    
     state_type state_;     // Current state
     policy::egreedy p_;
-    value_function::neuronal_network vf_;
+    cart_pole_tiling_value_function vf_;
+    value_function::neuronal_network nn_vf_;
 };
 
 int main(int argc, char* argv[])
 {
     config cfg;
-    cfg.gamma_ = 0.9;
-    cfg.alpha_ = 0.6;
+    cfg.gamma_ = 0.95;
+    cfg.lambda_ = 0.9;
+    cfg.alpha_ = 0.5;
     cfg.accumulating_= false;
 
     cart_pole_balancing cpb;
