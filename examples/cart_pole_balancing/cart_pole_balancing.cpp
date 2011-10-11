@@ -1,4 +1,5 @@
 #include <rll/rll.hpp>
+#include <rll/value_function/state_hash_lookup_table.hpp>
 
 #include <array>
 
@@ -39,77 +40,54 @@ enum
     ACTION = 4
 };
 
-class cart_pole_tiling_value_function : public value_function::iface
+static size_t get_box(const value_function::iface::state_rep_csp& st)
 {
-public:
-    cart_pole_tiling_value_function() 
-    {
-        values_.assign(0.0);
-    }
+    size_t box = 0;
 
-    double get_value(const state_rep_csp& st)
-    {
-        return values_[get_box(st)];
-    }
+    const double one_degree = 0.0174532;	/* 2pi/360 */
+    const double six_degrees = 0.1047192;
+    const double fifty_degrees = 0.87266;
 
-    void update(const update_list& lst)
-    {
-        for_each(lst.begin(), lst.end(), [&](update_list::const_reference r) -> void
-        {
-            values_[get_box(r.first)] = r.second;
-        });
-    }
+    const value_function::iface::state_rep& state = *st;
 
-private:
-    static size_t get_box(const state_rep_csp& st)
-    {
-        size_t box = 0;
+    if (state[CART_POSITION] < -0.8) 
+        box = 0;
+    else if (state[CART_POSITION] < 0.8) 
+        box = 1;
+    else
+        box = 2;
 
-        const double one_degree = 0.0174532;	/* 2pi/360 */
-        const double six_degrees = 0.1047192;
-        const double fifty_degrees = 0.87266;
+    if (state[CART_VELOCITY] < -0.5);
+    else if (state[CART_VELOCITY] < 0.5)
+        box += 3;
+    else
+        box += 6;
 
-        const state_rep& state = *st;
+    if (state[POLE_ANGLE] < -six_degrees);
+    else if (state[POLE_ANGLE] < -one_degree)
+        box += 9;
+    else if (state[POLE_ANGLE] < 0)
+        box += 18;
+    else if (state[POLE_ANGLE] < one_degree)
+        box += 27;
+    else if (state[POLE_ANGLE] < six_degrees)
+        box += 36;
+    else
+        box += 45;
 
-        if (state[CART_POSITION] < -0.8) 
-            box = 0;
-        else if (state[CART_POSITION] < 0.8) 
-            box = 1;
-        else
-            box = 2;
+    if (state[POLE_ANGULAR_VELOCITY] < -fifty_degrees);
+    else if (state[POLE_ANGULAR_VELOCITY] < fifty_degrees)
+        box += 54;
+    else
+        box += 108;
 
-        if (state[CART_VELOCITY] < -0.5);
-        else if (state[CART_VELOCITY] < 0.5)
-            box += 3;
-        else
-            box += 6;
+    if (state[ACTION] > 0)
+        box += 216;
 
-        if (state[POLE_ANGLE] < -six_degrees);
-        else if (state[POLE_ANGLE] < -one_degree)
-            box += 9;
-        else if (state[POLE_ANGLE] < 0)
-            box += 18;
-        else if (state[POLE_ANGLE] < one_degree)
-            box += 27;
-        else if (state[POLE_ANGLE] < six_degrees)
-            box += 36;
-        else
-            box += 45;
+    return box;
+}
 
-        if (state[POLE_ANGULAR_VELOCITY] < -fifty_degrees);
-        else if (state[POLE_ANGULAR_VELOCITY] < fifty_degrees)
-            box += 54;
-        else
-            box += 108;
-
-        if (state[ACTION] > 0)
-            box += 216;
-
-        return box;
-    }
-
-    std::array<double, 432> values_;
-};
+typedef value_function::state_hash_lookup_table<decltype(&get_box), 432> value_function_type;
 
 class cart_pole_balancing : public action_environment
 {
@@ -117,13 +95,14 @@ public:
     cart_pole_balancing()
         : state_(4)
         , actions_(2)
-        , p_(0.1)
+        , p_(0.001)
+        , vf_(0.0, &get_box)
         , nn_vf_(10)
     {        
         actions_[0] = -FORCE;
         actions_[1] = FORCE;
 
-        agents().push_back(make_shared<agent>(&nn_vf_, &p_));
+        agents().push_back(make_shared<agent>(&vf_, &p_, agent::OFFPOLICY));
     }
 
 private:
@@ -197,16 +176,17 @@ private:
     vector_rllt actions_;  // Possible actions    
     state_type state_;     // Current state
     policy::egreedy p_;
-    cart_pole_tiling_value_function vf_;
+    policy::greedy pg_;
+    value_function_type vf_;
     value_function::neuronal_network nn_vf_;
 };
 
 int main(int argc, char* argv[])
 {
     config cfg;
-    cfg.gamma_ = 0.95;
-    cfg.lambda_ = 0.9;
-    cfg.alpha_ = 0.5;
+    cfg.gamma_ = 0.9;
+    cfg.lambda_ = 1.0;
+    cfg.alpha_ = 0.1;
     cfg.accumulating_= false;
 
     cart_pole_balancing cpb;
