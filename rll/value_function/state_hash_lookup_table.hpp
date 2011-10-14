@@ -16,7 +16,7 @@ class static_lt_impl
 public:
     static_lt_impl(double init)
     {
-        values_.assign(init);
+        values_.fill(init);
     }
 
     double get_value(size_t idx)
@@ -67,8 +67,8 @@ struct more
 
 }
 
-template<typename HashFunc, int MaxValue = 0>
-class state_hash_lookup_table 
+template<typename HashFunc, size_t MaxValue = 0>
+class state_hash_lookup_table
   : public iface
   , public std::conditional<
         detail::more<MaxValue, 0>::value
@@ -83,8 +83,8 @@ class state_hash_lookup_table
       >::type base_type;
 
 public:
-    state_hash_lookup_table(double init = 0.0, HashFunc hash_func = HashFunc()) 
-        : base_type(init) 
+    state_hash_lookup_table(double init = 0.0, HashFunc hash_func = HashFunc())
+        : base_type(init)
         , hash_func_(hash_func)
     {
     }
@@ -98,10 +98,10 @@ public:
     /// @copybrief iface_tpl::update
     virtual void update(const update_list& lst)
     {
-        std::for_each(lst.begin(), lst.end(), [&](update_list::const_reference r) -> void 
+        for (auto i = lst.begin(); i != lst.end(); ++i) 
         {
-            base_type::update(hash_func_(r.first), r.second);
-        });
+            base_type::update(hash_func_(i->first), i->second);
+        }
     }
 
 private:
