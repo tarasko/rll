@@ -16,9 +16,9 @@
 ///
 /// @paragraph environment_types (Environment types)
 /// The library supports 2 types of environments: rll::state_environment and
-/// rll::action_environment. The first is used with agents that estimate state value
-/// function. And second - with agent that estimates state-action value function.
-/// Library user is supposed to inherit one of this classes and to implement few abstract
+/// rll::action_environment. The first is used with agents which estimate state value
+/// function. And second - with agent which estimates state-action value function.
+/// Library user is supposed to inherit one of this classes and implement few abstract
 /// virtual methods to define exact environment behavior. Each environment type support
 /// two convenient typedefs @b state_type and @b method_type. State type is
 /// a set of environment signals that represent environment state. Method type is special
